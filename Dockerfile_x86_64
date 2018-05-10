@@ -1,0 +1,15 @@
+FROM golang:1.8-alpine
+
+COPY . /OpLog
+
+#调用docker server
+ENV DOCKER_HOST 10.160.1.107:4243
+
+RUN cp -r /OpLog/github.com/ /usr/local/go/src/ && cp -r /OpLog/github.com/ /go/src/
+
+RUN cd /OpLog && go build operationLog.go
+RUN cp /OpLog/operationLog /OpLog/buildimage/
+RUN apk --no-cache add docker
+
+#CMD ls /LCD/image
+RUN docker build -f /OpLog/buildimage/Dockerfile_x86_64 -t oplog:latest /OpLog/buildimage/
